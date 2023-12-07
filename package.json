@@ -2,7 +2,8 @@
   "name": "ts-sidekiq",
   "version": "0.0.4",
   "description": "manage sidekiq",
-  "main": "build/index.js",
+  "main": "build/server.js",
+  "browser": "build/index.js",
   "files": [
     "package.json",
     "README.md",
