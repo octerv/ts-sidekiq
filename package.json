@@ -1,6 +1,6 @@
 {
   "name": "ts-sidekiq",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "manage sidekiq",
   "main": "build/server.js",
   "browser": "build/index.js",
