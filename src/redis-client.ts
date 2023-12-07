@@ -1,14 +1,14 @@
 import { createClient } from "redis";
 
-const redisClient = async () => {
-  return await createClient({ url: "redis://localhost:6379/5" })
+const redisClient = async (url?: string) => {
+  return await createClient({ url: url || "redis://localhost:6379/5" })
     .on("error", (err) => console.error("Redis Clinet Error", err))
     .connect();
 };
 
-export const getSidekiqData = async () => {
+export const getSidekiqData = async (redisUrl?: string) => {
   try {
-    const client = await redisClient();
+    const client = await redisClient(redisUrl);
 
     const queueKeys = await client.keys("queue:*");
     const queueData = await Promise.all(
