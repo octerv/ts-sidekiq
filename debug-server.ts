@@ -7,6 +7,7 @@ app.use(cors());
 
 app.get("/sidekiq", async (req: Request, res: Response) => {
   const data = await getSidekiqData();
+  console.log(JSON.stringify(data));
   res.json(data);
 });
 
