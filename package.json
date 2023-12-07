@@ -11,7 +11,7 @@
     "build"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp src/types.d.ts build/",
     "test": "jest",
     "prepare": "npm run build",
     "start-express": "ts-node debug-server.ts",

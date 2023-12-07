@@ -8,6 +8,20 @@ export type Stat = {
   value: string;
 };
 
+export type Info = {
+  hostname: string;
+  started_at: number;
+  pid: number;
+  tag: string;
+  concurrency: number;
+  queues: string[];
+  weights: { [key: string]: number }[];
+  labels: string[];
+  identity: string;
+  version: string;
+  embedded: boolean;
+};
+
 export type ProcessInfo = {
   rss: string;
   quiet: string;
