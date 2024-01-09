@@ -1,13 +1,39 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { getSidekiqData } from "./src/redis-client";
+import {
+  getRetryJobsDetails,
+  getSidekiqData,
+  removeJobFromRetry,
+} from "./src/redis-client";
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 app.get("/sidekiq", async (req: Request, res: Response) => {
   const data = await getSidekiqData();
-  console.log(JSON.stringify(data));
+  res.json(data);
+});
+
+app.get("/sidekiq/retry", async (req: Request, res: Response) => {
+  const data = await getRetryJobsDetails();
+  res.json(data);
+});
+
+app.post("/sidekiq/retry/delete", async (req: Request, res: Response) => {
+  const jids = req.body.jids;
+  if (!jids || jids.length === 0) {
+    return res.status(400).send("jids array is required");
+  }
+
+  try {
+    await removeJobFromRetry(jids);
+  } catch (error) {
+    console.error("Error removing job from retry:", error);
+    res.status(500).send("Failed to remove job from retry queue");
+  }
+
+  const data = await getRetryJobsDetails();
   res.json(data);
 });
 

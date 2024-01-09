@@ -1,4 +1,5 @@
 import { createClient } from "redis";
+import { RetryJobDetail } from "./types";
 
 const redisClient = async (url?: string) => {
   return await createClient({ url: url || "redis://localhost:6379/5" })
@@ -9,6 +10,9 @@ const redisClient = async (url?: string) => {
 export const getSidekiqData = async (redisUrl?: string) => {
   try {
     const client = await redisClient(redisUrl);
+
+    // すべてのキーを取得
+    const allKeys = await client.keys("*");
 
     const queueKeys = await client.keys("queue:*");
     const queueData = await Promise.all(
@@ -27,6 +31,10 @@ export const getSidekiqData = async (redisUrl?: string) => {
       })
     );
 
+    // "retry" キーのデータの件数を取得
+    const retryCount = await client.zCard("retry");
+    statsData.push({ stat: "retry", value: retryCount.toString() });
+
     const processSet = await client.sMembers("processes");
     const processData = await Promise.all(
       processSet.map(async (processKey) => {
@@ -35,8 +43,88 @@ export const getSidekiqData = async (redisUrl?: string) => {
       })
     );
 
-    return { queues: queueData, stats: statsData, processes: processData };
+    // cron_job:* にマッチするすべてのクロンジョブキーを取得
+    const cronJobKeys = await client.keys("cron_job:*");
+    const cronJobsData = await Promise.all(
+      cronJobKeys.map(async (key) => {
+        const type = await client.type(key); // キーのタイプを取得
+        switch (type) {
+          case "string":
+            const stringValue = await client.get(key);
+            return { key, type, value: stringValue };
+          case "list":
+            const listValues = await client.lRange(key, 0, -1);
+            return { key, type, value: listValues };
+          case "set":
+            const setValues = await client.sMembers(key);
+            return { key, type, value: setValues };
+          case "zset":
+            const zsetValues = await client.zRange(key, 0, -1);
+            return { key, type, value: zsetValues };
+          case "hash":
+            const hashValues = await client.hGetAll(key);
+            return { key, type, details: hashValues };
+          default:
+            return { key, type, message: "Unsupported type" };
+        }
+      })
+    );
+
+    return {
+      keys: allKeys,
+      queues: queueData,
+      stats: statsData,
+      processes: processData,
+      cronJobs: cronJobsData,
+    };
   } catch (err) {
     console.error(err);
+  }
+};
+
+export const getRetryJobsDetails = async (
+  redisUrl?: string
+): Promise<RetryJobDetail[]> => {
+  try {
+    const client = await redisClient(redisUrl);
+    const retryJobs = await client.zRange("retry", 0, -1);
+
+    const retryJobsData: RetryJobDetail[] = retryJobs.map((jobString) => {
+      try {
+        const jobDetails: RetryJobDetail = JSON.parse(jobString);
+        return jobDetails;
+      } catch (err) {
+        console.error(`JSON parsing error for job: ${jobString}`, err);
+        // 失敗した場合は空のオブジェクトを返します（または適切なエラー処理を実施する）
+        return {} as RetryJobDetail;
+      }
+    });
+
+    return retryJobsData;
+  } catch (err) {
+    console.error("失敗したジョブの取得中にエラーが発生しました:", err);
+    // エラーが発生した場合は空の配列を返します（または適切なエラー処理を実施する）
+    return [];
+  }
+};
+
+export const removeJobFromRetry = async (jids: string[], redisUrl?: string) => {
+  try {
+    const client = await redisClient(redisUrl);
+    const jobs = await client.zRange("retry", 0, -1);
+
+    for (const jobString of jobs) {
+      const job = JSON.parse(jobString);
+      if (jids.includes(job.jid)) {
+        // 指定されたjidを持つジョブを削除
+        await client.zRem("retry", jobString);
+        console.log(
+          `Job with jid: ${job.jid} has been removed from retry queue.`
+        );
+      }
+    }
+  } catch (err) {
+    console.error("Error removing job from retry:", err);
+    throw err;
   }
 };

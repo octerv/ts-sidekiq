@@ -1,1 +1,3 @@
-# ts-sidekiq-dashboard
+# ts-sidekiq
+
+- [Recharts](https://recharts.org/)
