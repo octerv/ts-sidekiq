@@ -1,5 +1,5 @@
 import { createClient } from "redis";
-import { RetryJobDetail } from "./types";
+import { SidekiqJob, SidekiqRetryJob } from "./types";
 
 const redisClient = async (url?: string) => {
   return await createClient({ url: url || "redis://localhost:6379/5" })
@@ -82,21 +82,46 @@ export const getSidekiqData = async (redisUrl?: string) => {
   }
 };
 
+export const getQueueJobs = async (
+  queueName: string,
+  redisUrl?: string
+): Promise<SidekiqJob[]> => {
+  try {
+    const client = await redisClient(redisUrl);
+    const jobs = await client.lRange(`queue:${queueName}`, 0, -1);
+
+    const queueJobsData: SidekiqJob[] = jobs.map((jobString) => {
+      try {
+        const jobDetails: SidekiqJob = JSON.parse(jobString);
+        return jobDetails;
+      } catch (err) {
+        console.error(`JSON parsing error for job: ${jobString}`, err);
+        return {} as SidekiqJob;
+      }
+    });
+
+    return queueJobsData;
+  } catch (err) {
+    console.error(`Failed to get jobs from queue: ${queueName}`, err);
+    return [];
+  }
+};
+
 export const getRetryJobsDetails = async (
   redisUrl?: string
-): Promise<RetryJobDetail[]> => {
+): Promise<SidekiqRetryJob[]> => {
   try {
     const client = await redisClient(redisUrl);
     const retryJobs = await client.zRange("retry", 0, -1);
 
-    const retryJobsData: RetryJobDetail[] = retryJobs.map((jobString) => {
+    const retryJobsData: SidekiqRetryJob[] = retryJobs.map((jobString) => {
       try {
-        const jobDetails: RetryJobDetail = JSON.parse(jobString);
+        const jobDetails: SidekiqRetryJob = JSON.parse(jobString);
         return jobDetails;
       } catch (err) {
         console.error(`JSON parsing error for job: ${jobString}`, err);
         // 失敗した場合は空のオブジェクトを返します（または適切なエラー処理を実施する）
-        return {} as RetryJobDetail;
+        return {} as SidekiqRetryJob;
       }
     });
 

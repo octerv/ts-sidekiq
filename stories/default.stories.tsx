@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
-import Dashboard from "../src/dashboard";
-import RetryTable from "../src/components/retry-table";
-import { Data, RetryJobDetail } from "../src/types";
+import { SidekiqDashboard, SidekiqRetry, SidekiqQueue } from "../src/index";
+import {
+  SidekiqDashboardData,
+  SidekiqJob,
+  SidekiqRetryJob,
+} from "../src/types";
 
 export default {
   title: "Dashboard",
-  component: Dashboard,
+  component: SidekiqDashboard,
 };
 
 export const Default = () => {
-  const [data, setData] = useState<Data>({
+  const [data, setData] = useState<SidekiqDashboardData>({
     queues: [],
     stats: [],
     processes: [],
@@ -23,11 +26,19 @@ export const Default = () => {
         setData(data);
       });
   }, []);
-  return <Dashboard data={data} />;
+  const onClick = (key: string) => {
+    console.log(key);
+  };
+  return (
+    <>
+      <h1>Sidekiq Dashboard</h1>
+      <SidekiqDashboard data={data} onKeyClick={onClick} />
+    </>
+  );
 };
 
 export const Retry = () => {
-  const [data, setData] = useState<RetryJobDetail[]>([]);
+  const [jobs, setJobs] = useState<SidekiqRetryJob[]>([]);
   const [jids, setJids] = useState<string[]>([]);
 
   useEffect(() => {
@@ -35,7 +46,7 @@ export const Retry = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        setData(data);
+        setJobs(data);
       });
   }, []);
 
@@ -52,7 +63,7 @@ export const Retry = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ jids }), // サーバーに送るデータ
+          body: JSON.stringify({ jids }),
         }
       );
 
@@ -61,7 +72,7 @@ export const Retry = () => {
       }
 
       const data = await response.json();
-      setData(data);
+      setJobs(data);
     } catch (error) {
       console.error("Failed to delete the job:", error);
       alert("Failed to delete the job");
@@ -69,8 +80,33 @@ export const Retry = () => {
   };
   return (
     <>
+      <h1>Sidekiq Retry</h1>
       <button onClick={deleteJobs}>Delete Jobs</button>
-      <RetryTable data={data} onSelectedJobs={onSelectedJobs} />
+      <SidekiqRetry retryJobs={jobs} onSelectedJobs={onSelectedJobs} />
+    </>
+  );
+};
+
+export const Queue = () => {
+  const [jobs, setJobs] = useState<SidekiqJob[]>([]);
+  useEffect(() => {
+    fetch("http://localhost:3003/sidekiq/queue", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ queueName: "separating" }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setJobs(data);
+      });
+  }, []);
+  return (
+    <>
+      <h1>Sidekiq Queue</h1>
+      <SidekiqQueue jobs={jobs} />
     </>
   );
 };

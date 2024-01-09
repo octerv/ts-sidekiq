@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { RetryJobDetail } from "../types";
+import { SidekiqRetryJob } from "../types";
 import { cellStyle, headerCellStyle, tableStyle } from "../styles";
 
 interface Props {
-  data: RetryJobDetail[];
-  onSelectedJobs: (selectedJIDs: string[]) => void; // 選択されたジョブのJIDを処理するコールバック関数
+  retryJobs: SidekiqRetryJob[];
+  onSelectedJobs: (selectedJIDs: string[]) => void;
 }
 
-const RetryTable = ({ data, onSelectedJobs }: Props) => {
+const RetryJobsTable: React.FC<Props> = ({ retryJobs, onSelectedJobs }) => {
   const [selectedJIDs, setSelectedJIDs] = useState<string[]>([]);
 
   const handleCheckboxChange = (jid: string, isChecked: boolean) => {
@@ -40,7 +40,7 @@ const RetryTable = ({ data, onSelectedJobs }: Props) => {
         </tr>
       </thead>
       <tbody>
-        {data.map((job) => (
+        {retryJobs.map((job) => (
           <tr key={job.jid}>
             <td style={cellStyle}>
               <input
@@ -64,4 +64,4 @@ const RetryTable = ({ data, onSelectedJobs }: Props) => {
   );
 };
 
-export default RetryTable;
+export default RetryJobsTable;

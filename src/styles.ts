@@ -18,3 +18,9 @@ export const headerCellStyle: CSSProperties = {
   border: "1px solid black",
   backgroundColor: "#f2f2f2",
 };
+
+export const linkStyle: CSSProperties = {
+  color: "blue", // リンクの色
+  textDecoration: "underline", // 下線
+  cursor: "pointer", // マウスカーソルをポインターに変更
+};

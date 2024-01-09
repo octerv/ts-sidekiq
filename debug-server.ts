@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import {
+  getQueueJobs,
   getRetryJobsDetails,
   getSidekiqData,
   removeJobFromRetry,
@@ -12,6 +13,16 @@ app.use(express.json());
 
 app.get("/sidekiq", async (req: Request, res: Response) => {
   const data = await getSidekiqData();
+  res.json(data);
+});
+
+app.post("/sidekiq/queue", async (req: Request, res: Response) => {
+  const queueName = req.body.queueName;
+  if (!queueName) {
+    return res.status(400).send("queueName is required");
+  }
+
+  const data = await getQueueJobs(queueName);
   res.json(data);
 });
 

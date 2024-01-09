@@ -1,14 +1,18 @@
 import React from "react";
-import { CronJob } from "../types";
+import { SidekiqCronJob } from "../types";
 import { cellStyle, headerCellStyle, tableStyle } from "../styles";
 
 interface Props {
-  cronJobs: CronJob[];
+  cronJobs: SidekiqCronJob[];
 }
 
-const CronTable: React.FC<Props> = ({ cronJobs }) => (
-  <div>
-    <h2>Cron</h2>
+const CronsTable: React.FC<Props> = ({ cronJobs }) => {
+  // スケジュール定義のみをフィルタリング
+  const scheduleJobs = cronJobs.filter(
+    (job) => !job.key.includes("jid_history") && !job.key.includes("enqueued")
+  );
+
+  return (
     <table style={tableStyle}>
       <thead>
         <tr>
@@ -18,7 +22,7 @@ const CronTable: React.FC<Props> = ({ cronJobs }) => (
         </tr>
       </thead>
       <tbody>
-        {cronJobs.map((job, index) => (
+        {scheduleJobs.map((job, index) => (
           <tr key={index}>
             <td style={cellStyle}>{job.key.replace("cron_job:", "")}</td>
             <td style={cellStyle}>{job.details?.cron}</td>
@@ -27,7 +31,7 @@ const CronTable: React.FC<Props> = ({ cronJobs }) => (
         ))}
       </tbody>
     </table>
-  </div>
-);
+  );
+};
 
-export default CronTable;
+export default CronsTable;
