@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { RetryJobDetail } from "../types";
 import { cellStyle, headerCellStyle, tableStyle } from "../styles";
 
-type Props = {
+interface Props {
   data: RetryJobDetail[];
   onSelectedJobs: (selectedJIDs: string[]) => void; // 選択されたジョブのJIDを処理するコールバック関数
-};
+}
 
-const RetryTable: React.FC<Props> = ({ data, onSelectedJobs }) => {
+const RetryTable = ({ data, onSelectedJobs }: Props) => {
   const [selectedJIDs, setSelectedJIDs] = useState<string[]>([]);
 
   const handleCheckboxChange = (jid: string, isChecked: boolean) => {
