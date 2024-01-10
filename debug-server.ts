@@ -5,7 +5,7 @@ import {
   getSidekiqRetryJobs,
   getSidekiqData,
   removeSidekiqRetryJob,
-} from "./src/redis-client";
+} from "./src/server";
 
 const app = express();
 app.use(cors());

@@ -1,5 +1,5 @@
 import React from "react";
-import { SidekiqCronJob } from "../../types/sidekiq";
+import type { SidekiqCronJob } from "../../types/sidekiq";
 import { cellStyle, headerCellStyle, tableStyle } from "../styles";
 
 interface Props {

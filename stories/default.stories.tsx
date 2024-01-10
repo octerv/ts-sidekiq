@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { SidekiqDashboard, SidekiqRetry, SidekiqQueue } from "../src/client";
-import {
+import type {
   SidekiqDashboardData,
   SidekiqJob,
   SidekiqRetryJob,
-} from "../src/client";
+} from "../types/sidekiq";
 
 export default {
   title: "Dashboard",

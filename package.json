@@ -15,7 +15,7 @@
     "build": "tsc",
     "test": "jest",
     "prepare": "npm run build",
-    "start-express": "ts-node debug-server.ts",
+    "start-express": "ts-node --project tsconfig.dev.json debug-server.ts",
     "preview": "concurrently \"npm:preview:*\"",
     "preview:ladle": "npx ladle serve",
     "preview:express": "npm run start-express"
