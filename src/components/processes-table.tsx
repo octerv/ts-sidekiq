@@ -1,5 +1,8 @@
 import React from "react";
-import type { SidekiqProcess, SidekiqProcessInfoDetail } from "../types";
+import type {
+  SidekiqProcess,
+  SidekiqProcessInfoDetail,
+} from "../../types/sidekiq";
 import { tableStyle, cellStyle, headerCellStyle } from "../styles";
 
 type QueueInfo = {

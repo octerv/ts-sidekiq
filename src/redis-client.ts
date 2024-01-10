@@ -1,5 +1,5 @@
 import { createClient } from "redis";
-import { SidekiqJob, SidekiqRetryJob } from "./types";
+import { SidekiqJob, SidekiqRetryJob } from "../types/sidekiq";
 
 const redisClient = async (url?: string) => {
   return await createClient({ url: url || "redis://localhost:6379/5" })

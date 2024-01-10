@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SidekiqRetryJob } from "../types";
+import { SidekiqRetryJob } from "../../types/sidekiq";
 import { cellStyle, headerCellStyle, tableStyle } from "../styles";
 
 interface Props {

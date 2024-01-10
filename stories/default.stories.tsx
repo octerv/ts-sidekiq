@@ -4,7 +4,7 @@ import {
   SidekiqDashboardData,
   SidekiqJob,
   SidekiqRetryJob,
-} from "../src/types";
+} from "../src/client";
 
 export default {
   title: "Dashboard",

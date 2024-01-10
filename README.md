@@ -32,7 +32,7 @@ export {
   SidekiqDashboard,
   SidekiqRetry,
   SidekiqQueue,
-} from "ts-sidekiq/build/index.js";
+} from "ts-sidekiq/build/client.js";
 ```
 
 #### Server Library

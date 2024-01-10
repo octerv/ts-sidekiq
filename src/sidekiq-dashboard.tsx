@@ -2,7 +2,7 @@ import React from "react";
 import QueuesTable from "./components/queues-table";
 import StatisticsTable from "./components/statistics-table";
 import ProcessesTable from "./components/processes-table";
-import { SidekiqDashboardData } from "./types";
+import { SidekiqDashboardData } from "../types/sidekiq";
 import StatsLineChart from "./components/stats-line-chart";
 import CronsTable from "./components/crons-table";
 

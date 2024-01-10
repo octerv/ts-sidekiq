@@ -1,5 +1,5 @@
 import React from "react";
-import { SidekiqRetryJob } from "./types";
+import { SidekiqRetryJob } from "../types/sidekiq";
 import RetryJobsTable from "./components/retry-jobs-table";
 
 interface Props {

@@ -1,5 +1,5 @@
 import React from "react";
-import { SidekiqStat } from "../types";
+import { SidekiqStat } from "../../types/sidekiq";
 import { tableStyle, cellStyle, headerCellStyle, linkStyle } from "../styles";
 
 interface Props {
