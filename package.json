@@ -3,7 +3,7 @@
   "version": "0.2.1",
   "description": "manage sidekiq",
   "main": "build/server.js",
-  "browser": "build/index.js",
+  "browser": "build/client.js",
   "files": [
     "package.json",
     "README.md",

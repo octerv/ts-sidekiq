@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import {
-  getQueueJobs,
-  getRetryJobsDetails,
+  getSidekiqQueueJobs,
+  getSidekiqRetryJobs,
   getSidekiqData,
-  removeJobFromRetry,
+  removeSidekiqRetryJob,
 } from "./src/redis-client";
 
 const app = express();
@@ -22,12 +22,12 @@ app.post("/sidekiq/queue", async (req: Request, res: Response) => {
     return res.status(400).send("queueName is required");
   }
 
-  const data = await getQueueJobs(queueName);
+  const data = await getSidekiqQueueJobs(queueName);
   res.json(data);
 });
 
 app.get("/sidekiq/retry", async (req: Request, res: Response) => {
-  const data = await getRetryJobsDetails();
+  const data = await getSidekiqRetryJobs();
   res.json(data);
 });
 
@@ -38,13 +38,13 @@ app.post("/sidekiq/retry/delete", async (req: Request, res: Response) => {
   }
 
   try {
-    await removeJobFromRetry(jids);
+    await removeSidekiqRetryJob(jids);
   } catch (error) {
     console.error("Error removing job from retry:", error);
     res.status(500).send("Failed to remove job from retry queue");
   }
 
-  const data = await getRetryJobsDetails();
+  const data = await getSidekiqRetryJobs();
   res.json(data);
 });
 

@@ -11,6 +11,37 @@
 ## Server Functions
 
 - getSidekiqData
-- getQueueJobs
-- getRetryJobsDetails
-- removeJobFromRetry
+- getSidekiqQueueJobs
+- getSidekiqRetryJobs
+- removeSidekiqRetryJob
+
+## Usage
+
+### Install
+
+```
+npm install ts-sidekiq
+```
+
+### Import
+
+#### Client Library
+
+```
+export {
+  SidekiqDashboard,
+  SidekiqRetry,
+  SidekiqQueue,
+} from "ts-sidekiq/build/index.js";
+```
+
+#### Server Library
+
+```
+import {
+  getSidekiqData,
+  getSidekiqQueueJobs,
+  getSidekiqRetryJobs,
+  removeSidekiqRetryJob,
+} from "ts-sidekiq";
+```

@@ -7,7 +7,7 @@ const redisClient = async (url?: string) => {
     .connect();
 };
 
-export const getSidekiqData = async (redisUrl?: string) => {
+const getSidekiqData = async (redisUrl?: string) => {
   try {
     const client = await redisClient(redisUrl);
 
@@ -82,7 +82,7 @@ export const getSidekiqData = async (redisUrl?: string) => {
   }
 };
 
-export const getQueueJobs = async (
+const getSidekiqQueueJobs = async (
   queueName: string,
   redisUrl?: string
 ): Promise<SidekiqJob[]> => {
@@ -107,7 +107,7 @@ export const getQueueJobs = async (
   }
 };
 
-export const getRetryJobsDetails = async (
+const getSidekiqRetryJobs = async (
   redisUrl?: string
 ): Promise<SidekiqRetryJob[]> => {
   try {
@@ -133,7 +133,7 @@ export const getRetryJobsDetails = async (
   }
 };
 
-export const removeJobFromRetry = async (jids: string[], redisUrl?: string) => {
+const removeSidekiqRetryJob = async (jids: string[], redisUrl?: string) => {
   try {
     const client = await redisClient(redisUrl);
     const jobs = await client.zRange("retry", 0, -1);
@@ -152,4 +152,11 @@ export const removeJobFromRetry = async (jids: string[], redisUrl?: string) => {
     console.error("Error removing job from retry:", err);
     throw err;
   }
+};
+
+export {
+  getSidekiqData,
+  getSidekiqQueueJobs,
+  getSidekiqRetryJobs,
+  removeSidekiqRetryJob,
 };
