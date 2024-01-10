@@ -1,5 +1,6 @@
 {
   "name": "ts-sidekiq",
+  "type": "module",
   "version": "0.3.2",
   "description": "manage sidekiq",
   "main": "build/server.js",
@@ -15,8 +16,8 @@
     "build": "tsc",
     "test": "jest",
     "prepare": "npm run build",
-    "start-express": "ts-node --project tsconfig.dev.json debug-server.ts",
-    "preview": "concurrently \"npm:preview:*\"",
+    "start-express": "node debug-server.js",
+    "preview": "npm run build && concurrently \"npm:preview:*\"",
     "preview:ladle": "npx ladle serve",
     "preview:express": "npm run start-express"
   },

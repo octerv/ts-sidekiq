@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SidekiqDashboard, SidekiqRetry, SidekiqQueue } from "../src/client";
+import { SidekiqDashboard, SidekiqRetry, SidekiqQueue } from "../build/client";
 import type {
   SidekiqDashboardData,
   SidekiqJob,

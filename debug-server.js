@@ -1,22 +1,22 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import cors from "cors";
 import {
   getSidekiqQueueJobs,
   getSidekiqRetryJobs,
   getSidekiqData,
   removeSidekiqRetryJob,
-} from "./src/server";
+} from "./build/server.js";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/sidekiq", async (req: Request, res: Response) => {
+app.get("/sidekiq", async (req, res) => {
   const data = await getSidekiqData();
   res.json(data);
 });
 
-app.post("/sidekiq/queue", async (req: Request, res: Response) => {
+app.post("/sidekiq/queue", async (req, res) => {
   const queueName = req.body.queueName;
   if (!queueName) {
     return res.status(400).send("queueName is required");
@@ -26,12 +26,12 @@ app.post("/sidekiq/queue", async (req: Request, res: Response) => {
   res.json(data);
 });
 
-app.get("/sidekiq/retry", async (req: Request, res: Response) => {
+app.get("/sidekiq/retry", async (req, res) => {
   const data = await getSidekiqRetryJobs();
   res.json(data);
 });
 
-app.post("/sidekiq/retry/delete", async (req: Request, res: Response) => {
+app.post("/sidekiq/retry/delete", async (req, res) => {
   const jids = req.body.jids;
   if (!jids || jids.length === 0) {
     return res.status(400).send("jids array is required");
