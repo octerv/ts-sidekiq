@@ -4,12 +4,13 @@ import QueueJobsTable from "./components/queue-jobs-table";
 
 interface Props {
   jobs: SidekiqJob[];
+  onSelectedJobs: (selectedJIDs: string[]) => void; // 選択されたジョブのJIDを処理するコールバック関数
 }
 
-const SidekiqQueue = ({ jobs }: Props) => {
+const SidekiqQueue = ({ jobs, onSelectedJobs }: Props) => {
   return (
     <>
-      <QueueJobsTable jobs={jobs} />
+      <QueueJobsTable jobs={jobs} onSelectedJobs={onSelectedJobs} />
     </>
   );
 };

@@ -133,6 +133,31 @@ const getSidekiqRetryJobs = async (
   }
 };
 
+const removeSidekiqQueueJob = async (
+  queueName: string,
+  jids: string[],
+  redisUrl?: string
+) => {
+  try {
+    const client = await redisClient(redisUrl);
+    const jobs = await client.lRange(`queue:${queueName}`, 0, -1);
+
+    for (const jobString of jobs) {
+      const job = JSON.parse(jobString);
+      if (jids.includes(job.jid)) {
+        // 指定されたjidを持つジョブを削除
+        await client.lRem(`queue:${queueName}`, 0, jobString);
+        console.log(
+          `Job with jid: ${job.jid} has been removed from queue: ${queueName}.`
+        );
+      }
+    }
+  } catch (err) {
+    console.error("Error removing job from queue:", err);
+    throw err;
+  }
+};
+
 const removeSidekiqRetryJob = async (jids: string[], redisUrl?: string) => {
   try {
     const client = await redisClient(redisUrl);
@@ -158,5 +183,6 @@ export {
   getSidekiqData,
   getSidekiqQueueJobs,
   getSidekiqRetryJobs,
+  removeSidekiqQueueJob,
   removeSidekiqRetryJob,
 };

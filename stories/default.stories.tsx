@@ -73,11 +73,13 @@ export const Retry = () => {
 
       const data = await response.json();
       setJobs(data);
+      setJids([]);
     } catch (error) {
       console.error("Failed to delete the job:", error);
       alert("Failed to delete the job");
     }
   };
+
   return (
     <>
       <h1>Sidekiq Retry</h1>
@@ -89,6 +91,8 @@ export const Retry = () => {
 
 export const Queue = () => {
   const [jobs, setJobs] = useState<SidekiqJob[]>([]);
+  const [jids, setJids] = useState<string[]>([]);
+
   useEffect(() => {
     fetch("http://localhost:3003/sidekiq/queue", {
       method: "POST",
@@ -103,10 +107,42 @@ export const Queue = () => {
         setJobs(data);
       });
   }, []);
+
+  const onSelectedJobs = (selectedJids: string[]) => {
+    setJids(selectedJids);
+  };
+
+  const deleteJobs = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3003/sidekiq/queue/delete",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ queueName: "separating", jids }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setJobs(data);
+      setJids([]);
+    } catch (error) {
+      console.error("Failed to delete the job:", error);
+      alert("Failed to delete the job");
+    }
+  };
+
   return (
     <>
       <h1>Sidekiq Queue</h1>
-      <SidekiqQueue jobs={jobs} />
+      <button onClick={deleteJobs}>Delete Jobs</button>
+      <SidekiqQueue jobs={jobs} onSelectedJobs={onSelectedJobs} />
     </>
   );
 };
