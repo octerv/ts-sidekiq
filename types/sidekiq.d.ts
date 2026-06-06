@@ -46,6 +46,14 @@ export type SidekiqJob = {
   enqueued_at: number; // Unixタイムスタンプ
 };
 
+export type SidekiqWorkingJob = {
+  processKey: string;
+  threadId: string;
+  queue: string;
+  run_at: number | null;
+  payload: SidekiqJob;
+};
+
 export type SidekiqRetryJob = {
   retry: boolean;
   queue: string;

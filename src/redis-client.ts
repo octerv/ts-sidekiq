@@ -1,5 +1,9 @@
 import { createClient } from "redis";
-import type { SidekiqJob, SidekiqRetryJob } from "../types/sidekiq";
+import type {
+  SidekiqJob,
+  SidekiqRetryJob,
+  SidekiqWorkingJob,
+} from "../types/sidekiq";
 
 const redisClient = async (url?: string) => {
   return await createClient({ url: url || "redis://localhost:6379/5" })
@@ -133,6 +137,55 @@ const getSidekiqRetryJobs = async (
   }
 };
 
+const getSidekiqWorkingJobs = async (
+  redisUrl?: string
+): Promise<SidekiqWorkingJob[]> => {
+  try {
+    const client = await redisClient(redisUrl);
+    const processSet = await client.sMembers("processes");
+    const workingJobs = await Promise.all(
+      processSet.map(async (processKey) => {
+        const work = await client.hGetAll(`${processKey}:work`);
+        const processWorkingJobs: SidekiqWorkingJob[] = [];
+
+        Object.entries(work).forEach(([threadId, jobString]) => {
+          try {
+            const jobDetails = JSON.parse(jobString);
+            const payload = jobDetails.payload as SidekiqJob | undefined;
+
+            if (!payload) {
+              return;
+            }
+
+            processWorkingJobs.push({
+              processKey,
+              threadId,
+              queue: jobDetails.queue ?? payload.queue ?? "",
+              run_at:
+                typeof jobDetails.run_at === "number"
+                  ? jobDetails.run_at
+                  : null,
+              payload,
+            });
+          } catch (err) {
+            console.error(
+              `JSON parsing error for working job: ${jobString}`,
+              err
+            );
+          }
+        });
+
+        return processWorkingJobs;
+      })
+    );
+
+    return workingJobs.flat();
+  } catch (err) {
+    console.error("Failed to get working jobs:", err);
+    return [];
+  }
+};
+
 const removeSidekiqQueueJob = async (
   queueName: string,
   jids: string[],
@@ -183,6 +236,7 @@ export {
   getSidekiqData,
   getSidekiqQueueJobs,
   getSidekiqRetryJobs,
+  getSidekiqWorkingJobs,
   removeSidekiqQueueJob,
   removeSidekiqRetryJob,
 };
